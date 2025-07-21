@@ -1,5 +1,6 @@
 package api;
 
+import io.qameta.allure.*;
 import io.restassured.http.ContentType;
 import model.User;
 import org.junit.Test;
@@ -8,14 +9,17 @@ import utils.UserGenerator;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+@Epic("Stellar Burgers API")
+@Feature("Обновление данных пользователя")
+@Owner("ТвоёИмя")
 public class UserUpdateTest extends BaseApiTest {
 
-    // Обновление данных с авторизацией (валидный accessToken)
     @Test
+    @Story("Обновление данных с авторизацией")
+    @Description("Пользователь может обновить email/имя при наличии accessToken")
     public void updateUserDataWithAuthShouldBeSuccessful() {
         User user = UserGenerator.getRandomUser();
 
-        // Регистрация и получение accessToken
         String accessToken = given()
                 .contentType(ContentType.JSON)
                 .body(user)
@@ -24,7 +28,6 @@ public class UserUpdateTest extends BaseApiTest {
                 .extract()
                 .path("accessToken");
 
-        // Обновляем имя и email
         User updatedUser = new User("updated" + System.currentTimeMillis() + "@yandex.ru", "password", "UpdatedName");
 
         given()
@@ -39,8 +42,9 @@ public class UserUpdateTest extends BaseApiTest {
                 .body("user.name", equalTo(updatedUser.name));
     }
 
-    // Обновление данных без авторизации (нет accessToken)
     @Test
+    @Story("Обновление данных без авторизации")
+    @Description("Ошибка, если accessToken не передан")
     public void updateUserDataWithoutAuthShouldFail() {
         User updatedUser = new User("test" + System.currentTimeMillis() + "@yandex.ru", "password", "UpdatedName");
 

@@ -1,5 +1,6 @@
 package api;
 
+import io.qameta.allure.*;
 import model.User;
 import org.junit.Test;
 import utils.UserGenerator;
@@ -7,9 +8,14 @@ import utils.UserGenerator;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+@Epic("Stellar Burgers API")
+@Feature("Регистрация пользователя")
+@Owner("ТвоёИмя")
 public class UserRegistrationTest extends BaseApiTest {
 
     @Test
+    @Story("Валидная регистрация")
+    @Description("Пользователь может зарегистрироваться с валидными данными")
     public void registrationWithValidDataShouldBeSuccessful() {
         User user = UserGenerator.getRandomUser();
         given()
@@ -22,11 +28,11 @@ public class UserRegistrationTest extends BaseApiTest {
     }
 
     @Test
+    @Story("Регистрация уже существующего пользователя")
+    @Description("Ошибка, если пользователь уже существует")
     public void registrationWithAlreadyRegisteredUserShouldFail() {
         User user = UserGenerator.getRandomUser();
-        // Первый раз регистрация
         given().header("Content-type", "application/json").body(user).post("/api/auth/register");
-        // Второй раз тот же пользователь
         given().header("Content-type", "application/json").body(user).post("/api/auth/register")
                 .then().statusCode(403)
                 .body("success", is(false))
@@ -34,11 +40,12 @@ public class UserRegistrationTest extends BaseApiTest {
     }
 
     @Test
+    @Story("Регистрация без email")
+    @Description("Ошибка, если не передан email")
     public void registrationWithoutEmailShouldFail() {
         User user = UserGenerator.getUserWithoutEmail();
         given().header("Content-type", "application/json").body(user).post("/api/auth/register")
                 .then().statusCode(403)
                 .body("success", is(false));
     }
-    // Аналогично — тесты без пароля, без имени
 }

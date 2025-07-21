@@ -1,5 +1,6 @@
 package api;
 
+import io.qameta.allure.*;
 import model.User;
 import model.Order;
 import org.junit.Test;
@@ -9,12 +10,16 @@ import utils.UserGenerator;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+@Epic("Stellar Burgers API")
+@Feature("Создание заказов")
+@Owner("ТвоёИмя")
 public class OrderCreateTest extends BaseApiTest {
 
     @Test
+    @Story("Создание заказа с авторизацией")
+    @Description("Пользователь с accessToken может создать заказ")
     public void createOrderWithAuthShouldBeSuccessful() {
         User user = UserGenerator.getRandomUser();
-        // Регистрируем пользователя и получаем accessToken
         String accessToken = given()
                 .header("Content-type", "application/json")
                 .body(user)
@@ -36,6 +41,8 @@ public class OrderCreateTest extends BaseApiTest {
     }
 
     @Test
+    @Story("Создание заказа без авторизации")
+    @Description("Пользователь без accessToken тоже может создать заказ")
     public void createOrderWithoutAuthShouldBeSuccessful() {
         Order order = OrderGenerator.getValidOrder();
         given()
@@ -48,6 +55,8 @@ public class OrderCreateTest extends BaseApiTest {
     }
 
     @Test
+    @Story("Создание заказа без ингредиентов")
+    @Description("Проверка ошибки при попытке создать заказ без ингредиентов")
     public void createOrderWithoutIngredientsShouldFail() {
         given()
                 .header("Content-type", "application/json")
@@ -60,12 +69,14 @@ public class OrderCreateTest extends BaseApiTest {
     }
 
     @Test
+    @Story("Создание заказа с невалидным ингредиентом")
+    @Description("Проверка 500 ошибки при несуществующем ингредиенте")
     public void createOrderWithInvalidIngredientShouldFail() {
         given()
                 .header("Content-type", "application/json")
                 .body(OrderGenerator.getOrderWithInvalidIngredient())
                 .post("/api/orders")
                 .then()
-                .statusCode(500); // Только код ошибки! Не проверяем поле success
+                .statusCode(500);
     }
 }

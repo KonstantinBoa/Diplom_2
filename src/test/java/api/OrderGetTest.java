@@ -1,5 +1,6 @@
 package api;
 
+import io.qameta.allure.*;
 import model.User;
 import model.Order;
 import org.junit.Test;
@@ -9,13 +10,16 @@ import utils.OrderGenerator;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+@Epic("Stellar Burgers API")
+@Feature("Получение заказов")
+@Owner("ТвоёИмя")
 public class OrderGetTest extends BaseApiTest {
 
     @Test
+    @Story("Получение заказов с авторизацией")
+    @Description("Пользователь с accessToken может получить список своих заказов")
     public void getOrdersWithAuthShouldBeSuccessful() {
         User user = UserGenerator.getRandomUser();
-
-        // Регистрируем пользователя и получаем accessToken
         String accessToken = given()
                 .header("Content-type", "application/json")
                 .body(user)
@@ -24,7 +28,6 @@ public class OrderGetTest extends BaseApiTest {
                 .extract()
                 .path("accessToken");
 
-        // Создаём заказ
         Order order = OrderGenerator.getValidOrder();
         given()
                 .header("Content-type", "application/json")
@@ -35,7 +38,6 @@ public class OrderGetTest extends BaseApiTest {
                 .statusCode(200)
                 .body("success", is(true));
 
-        // Получаем заказы пользователя
         given()
                 .header("Authorization", accessToken)
                 .get("/api/orders")
@@ -46,6 +48,8 @@ public class OrderGetTest extends BaseApiTest {
     }
 
     @Test
+    @Story("Получение заказов без авторизации")
+    @Description("Проверка ошибки при попытке получить заказы без accessToken")
     public void getOrdersWithoutAuthShouldFail() {
         given()
                 .get("/api/orders")
